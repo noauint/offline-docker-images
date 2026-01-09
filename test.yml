@@ -1,18 +1,20 @@
-services:
-  web:
-    image: php:8.2-apache
-    ports:
-      - "8080:80"
-    volumes:
-      - ./:/var/www/html
-    command:
-      - bash
-      - -lc
-      - |
-          a2enmod rewrite
-          sed -ri 's!/var/www/html!/var/www/html/webroot!g' /etc/apache2/sites-available/000-default.conf
-          printf '%s\n' '<Directory "/var/www/html/webroot">' '  AllowOverride All' '  Require all granted' '</Directory>' > /etc/apache2/conf-available/cakephp.conf
-          a2enconf cakephp
-          mkdir -p /var/www/html/tmp /var/www/html/logs
-          chmod -R 777 /var/www/html/tmp /var/www/html/logs
-          apache2-foreground
+name: export php:8.2-apache image
+on:
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull image
+        run: docker pull php:8.2-apache
+
+      - name: Save image to tar
+        run: docker save -o php_8.2_apache.tar php:8.2-apache
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php_8.2_apache_tar
+          path: php_8.2_apache.tar
+
