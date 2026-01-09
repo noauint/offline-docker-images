@@ -1,0 +1,19 @@
+name: export php:8.2-apache image
+on:
+  workflow_dispatch:
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pull image
+        run: docker pull php:8.2-apache
+
+      - name: Save image to tar
+        run: docker save -o php_8.2_apache.tar php:8.2-apache
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: php_8.2_apache_tar
+          path: php_8.2_apache.tar
