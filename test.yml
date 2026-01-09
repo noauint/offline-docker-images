@@ -1,0 +1,18 @@
+services:
+  web:
+    image: php:8.2-apache
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+    command:
+      - bash
+      - -lc
+      - |
+          a2enmod rewrite
+          sed -ri 's!/var/www/html!/var/www/html/webroot!g' /etc/apache2/sites-available/000-default.conf
+          printf '%s\n' '<Directory "/var/www/html/webroot">' '  AllowOverride All' '  Require all granted' '</Directory>' > /etc/apache2/conf-available/cakephp.conf
+          a2enconf cakephp
+          mkdir -p /var/www/html/tmp /var/www/html/logs
+          chmod -R 777 /var/www/html/tmp /var/www/html/logs
+          apache2-foreground
